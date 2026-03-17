@@ -1,0 +1,406 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "E-commerce API - CSE341",
+    "description": "API for product and category management",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Kevin Guzman",
+      "email": "kguzman077@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Category": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Electronics"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "Electronic devices and accessories",
+            "nullable": true
+          },
+          "parentCategory": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": "507f191e810c19729de860ea"
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "example": "electronics"
+          },
+          "displayOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "example": 10
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true,
+            "example": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-03-10T14:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-03-10T14:30:00.000Z"
+          }
+        },
+        "required": ["name", "slug"]
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Wireless Headphones"
+          },
+          "sku": {
+            "type": "string",
+            "pattern": "^[A-Z0-9-]+$",
+            "example": "WH-2025-BLK"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 2000,
+            "example": "High-quality noise-cancelling wireless headphones"
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "example": 89.99
+          },
+          "category": {
+            "type": "string",
+            "format": "uuid",
+            "example": "507f191e810c19729de860ea"
+          },
+          "stock": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 45
+          },
+          "brand": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "AudioPro"
+          },
+          "condition": {
+            "type": "string",
+            "enum": ["new", "refurbished", "used"],
+            "default": "new",
+            "example": "new"
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000,
+            "example": 0.35
+          },
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "length": { "type": "number", "minimum": 0, "example": 20 },
+              "width": { "type": "number", "minimum": 0, "example": 18 },
+              "height": { "type": "number", "minimum": 0, "example": 8 },
+              "unit": { "type": "string", "enum": ["cm", "in", "m"], "default": "cm", "example": "cm" }
+            },
+            "required": ["length", "width", "height"]
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true,
+            "example": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 30
+            },
+            "example": ["wireless", "noise-cancelling", "bluetooth"]
+          },
+          "inStock": {
+            "type": "boolean",
+            "readOnly": true,
+            "description": "Virtual field - true if stock > 0 and isActive",
+            "example": true
+          },
+          "weightLbs": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Virtual field - weight converted to pounds",
+            "example": "0.77"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-03-10T14:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-03-10T14:30:00.000Z"
+          }
+        },
+        "required": ["name", "sku", "description", "price", "category", "stock", "brand", "condition", "weight"]
+      },
+      "ProductUpdate": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 3, "maxLength": 100 },
+          "sku": { "type": "string", "pattern": "^[A-Z0-9-]+$" },
+          "description": { "type": "string", "minLength": 10, "maxLength": 2000 },
+          "price": { "type": "number", "minimum": 0, "maximum": 100000 },
+          "category": { "type": "string", "format": "uuid" },
+          "stock": { "type": "integer", "minimum": 0 },
+          "brand": { "type": "string", "maxLength": 50 },
+          "condition": { "type": "string", "enum": ["new", "refurbished", "used"] },
+          "weight": { "type": "number", "minimum": 0, "maximum": 1000 },
+          "dimensions": { "$ref": "#/components/schemas/Product/properties/dimensions" },
+          "tags": { "type": "array", "items": { "type": "string", "maxLength": 30 } },
+          "isActive": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "API root route",
+        "responses": {
+          "200": { "description": "API is operational" }
+        }
+      }
+    },
+
+    "/products": {
+      "get": {
+        "summary": "Get all products (with filters, pagination and search)",
+        "tags": ["Products"],
+        "responses": {
+          "200": {
+            "description": "Paginated list of products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "count": { "type": "integer" },
+                    "total": { "type": "integer" },
+                    "page": { "type": "integer" },
+                    "pages": { "type": "integer" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Product" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Server error" }
+        }
+      },
+      "post": {
+        "summary": "Create a new product",
+        "tags": ["Products"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Product" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Product created" },
+          "400": { "description": "Invalid data or category does not exist" },
+          "409": { "description": "Duplicate SKU" }
+        }
+      }
+    },
+
+    "/products/{id}": {
+      "get": {
+        "summary": "Get a product by ID",
+        "tags": ["Products"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          },
+          "404": { "description": "Product not found" }
+        }
+      },
+      "put": {
+        "summary": "Update a product",
+        "tags": ["Products"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Product updated" },
+          "404": { "description": "Not found" },
+          "409": { "description": "Duplicate SKU" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a product",
+        "tags": ["Products"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product deleted" },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+
+    "/categories": {
+      "get": {
+        "summary": "Get all categories (with filters)",
+        "tags": ["Categories"],
+        "responses": {
+          "200": {
+            "description": "List of categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "count": { "type": "integer" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Category" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new category",
+        "tags": ["Categories"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Category" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Category created" },
+          "409": { "description": "Duplicate name or slug" }
+        }
+      }
+    },
+
+    "/categories/{id}": {
+      "get": {
+        "summary": "Get a category by ID",
+        "tags": ["Categories"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Category" }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        }
+      },
+      "put": {
+        "summary": "Update a category",
+        "tags": ["Categories"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Category" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Category updated" },
+          "404": { "description": "Not found" },
+          "409": { "description": "Duplicate name" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a category (only if no products are associated)",
+        "tags": ["Categories"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Category deleted" },
+          "400": { "description": "Cannot delete: category has associated products" },
+          "404": { "description": "Not found" }
+        }
+      }
+    }
+  }
+}
