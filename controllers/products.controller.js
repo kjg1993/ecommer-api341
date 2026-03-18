@@ -1,6 +1,4 @@
 const Product = require('../models/product');
-const Category = require('../models/Category');
-const { Error } = require('mongoose');
 
 // get all products
 const getAllProducts = async (req, res) => {
