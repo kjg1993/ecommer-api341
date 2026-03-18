@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Category = require('../models/Category')
+const Category = require('../models/category')
 
 // GET all categories
 const getAllCategories = async (req, res) => {
