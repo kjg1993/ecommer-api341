@@ -29,7 +29,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
 app.use('/', require('./routes'));
-
 app.use(errorHandler);
 
 app.use((req, res) => {
@@ -39,7 +38,6 @@ app.use((req, res) => {
   });
 });
 
-// Conectar a DB y iniciar servidor
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
