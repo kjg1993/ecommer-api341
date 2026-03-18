@@ -43,7 +43,7 @@
             "type": "string",
             "format": "uuid",
             "nullable": true,
-            "example": "507f191e810c19729de860ea"
+            "example": null
           },
           "slug": {
             "type": "string",
@@ -64,11 +64,13 @@
           "createdAt": {
             "type": "string",
             "format": "date-time",
+            "readOnly": true,
             "example": "2025-03-10T14:30:00.000Z"
           },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
+            "readOnly": true,
             "example": "2025-03-10T14:30:00.000Z"
           }
         },
@@ -165,11 +167,13 @@
           "createdAt": {
             "type": "string",
             "format": "date-time",
+            "readOnly": true,
             "example": "2025-03-10T14:30:00.000Z"
           },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
+            "readOnly": true,
             "example": "2025-03-10T14:30:00.000Z"
           }
         },
