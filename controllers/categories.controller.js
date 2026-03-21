@@ -30,14 +30,7 @@ const getAllCategories = async (req, res, next) => {
             Category.countDocuments(query),
         ]);
 
-        res.status(200).json({
-            success: true,
-            count: categories.length,
-            total: totalCount,
-            page: Number(page),
-            pages: Math.ceil(totalCount / Number(limit)),
-            data: categories,
-        });
+        res.status(200).json({ categories});
     } catch (error) {
         next(error);
     }

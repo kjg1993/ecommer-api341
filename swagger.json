@@ -11,6 +11,10 @@
   },
   "servers": [
     {
+      "url": "https://ecommer-api341.onrender.com",
+      "description": "Production Server"
+    },
+    {
       "url": "http://localhost:3000",
       "description": "Development server"
     }
@@ -226,10 +230,6 @@
                   "type": "object",
                   "properties": {
                     "success": { "type": "boolean" },
-                    "count": { "type": "integer" },
-                    "total": { "type": "integer" },
-                    "page": { "type": "integer" },
-                    "pages": { "type": "integer" },
                     "data": {
                       "type": "array",
                       "items": { "$ref": "#/components/schemas/Product" }
@@ -325,7 +325,6 @@
                   "type": "object",
                   "properties": {
                     "success": { "type": "boolean" },
-                    "count": { "type": "integer" },
                     "data": {
                       "type": "array",
                       "items": { "$ref": "#/components/schemas/Category" }

@@ -9,6 +9,13 @@ const getAllProducts = async (req, res, next) => {
             limit = 10,
             sortBy = 'createdAt',
             order = 'desc',
+            category,
+            brand,
+            condition,
+            minPrice,
+            maxPrice,
+            search,
+            inStock
         } = req.query;
 
         if (page && (isNaN(page) || page < 1)) {
@@ -141,14 +148,7 @@ const getAllProducts = async (req, res, next) => {
             Product.countDocuments(query)
         ]);
 
-        res.status(200).json({
-            success: true,
-            count: products.length,
-            total: totalCount,
-            page: Number(page),
-            pages: Math.ceil(totalCount / Number(limit)),
-            data: products
-        });
+       res.status(200).json(products);
 
     } catch (error) {
         next(error);
