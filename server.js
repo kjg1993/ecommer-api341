@@ -10,7 +10,7 @@ const { connectDB } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 3001; 
+const PORT = process.env.PORT || 10000; 
 
 app.set("trust proxy", 1);
 
