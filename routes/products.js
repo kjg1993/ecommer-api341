@@ -1,29 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const productsController = require('../controllers/products.controller');
+const { isAuthenticated } = require('../middleware/auth'); 
 
-const {
-    getAllProducts,
-    getProductById,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-} = require('../controllers/products.controller');
-const { route } = require('.');
+// GET is public
+router.get('/', productsController.getAllProducts);
+router.get('/:id', productsController.getProductById);
 
-
-//get all records
-router.get('/', getAllProducts);
-
-//get by id
-router.get('/:id', getProductById);
-
-// create product
-router.post('/', createProduct);
-
-//update product
-router.put('/:id', updateProduct);
-
-// delete produc
-router.delete('/:id', deleteProduct);
+// POST, PUT, DELETE are protected (OAuth)
+router.post('/', isAuthenticated, productsController.createProduct);
+router.put('/:id', isAuthenticated, productsController.updateProduct);
+router.delete('/:id', isAuthenticated, productsController.deleteProduct);
 
 module.exports = router;

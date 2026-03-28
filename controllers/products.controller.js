@@ -1,7 +1,6 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
 
-// GET ALL PRODUCTS (con filtros y paginación)
 const getAllProducts = async (req, res, next) => {
     try {
         const {
@@ -385,7 +384,6 @@ const createProduct = async (req, res, next) => {
 };
 
 
-// UPDATE PRODUCT (con validación completa)
 const updateProduct = async (req, res, next) => {
     try {
         const updateData = { ...req.body };
