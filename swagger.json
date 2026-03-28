@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "E-commerce API - CSE341",
-    "description": "Bilingual API Documentation for product and category management with Google OAuth2 Authentication.",
+    "description": "Full API documentation with Google OAuth2. Access restricted routes by logging in first at /auth/google.",
     "version": "1.0.0",
     "contact": {
       "name": "Kevin Guzman",
@@ -11,12 +11,17 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000",
-      "description": "Development server (Local)"
+      "url": "https://ecommer-api341.onrender.com",
+      "description": "Production Server"
     },
     {
-      "url": "https://ecommer-api341.onrender.com",
-      "description": "Production Server (Render)"
+      "url": "http://localhost:3000",
+      "description": "Local Server"
+    }
+  ],
+  "security": [
+    {
+      "cookieAuth": []
     }
   ],
   "components": {
@@ -25,7 +30,7 @@
         "type": "apiKey",
         "in": "cookie",
         "name": "connect.sid",
-        "description": "Session cookie. Login at /auth/google first."
+        "description": "Session cookie. Authenticate via /auth/google."
       }
     },
     "schemas": {
@@ -33,35 +38,39 @@
         "type": "object",
         "required": ["name"],
         "properties": {
-          "name": { "type": "string", "example": "Electronics", "minLength": 2, "maxLength": 50 },
-          "description": { "type": "string", "example": "Gadgets and devices" },
+          "name": { "type": "string", "example": "Electronics" },
+          "description": { "type": "string", "example": "Gadgets" },
           "slug": { "type": "string", "example": "electronics" },
-          "parentCategory": { "type": "string", "example": "65f1a2b3c4d5e6f7a8b9c0d1" },
-          "isActive": { "type": "boolean", "default": true },
-          "displayOrder": { "type": "integer", "example": 0 }
+          "isActive": { "type": "boolean", "default": true }
         }
       },
       "Product": {
         "type": "object",
-        "required": ["name", "sku", "description", "price", "category", "brand", "condition", "weight"],
+        "required": ["name", "sku", "price", "category"],
         "properties": {
-          "name": { "type": "string", "example": "Wireless Headphones", "minLength": 3 },
-          "sku": { "type": "string", "example": "WH-2025-BLK" },
-          "description": { "type": "string", "example": "Noise-cancelling headphones", "minLength": 10 },
-          "price": { "type": "number", "example": 89.99, "minimum": 0 },
-          "category": { "type": "string", "example": "65f1a2b3c4d5e6f7a8b9c0d1" },
-          "stock": { "type": "integer", "example": 50, "minimum": 0 },
+          "name": { "type": "string", "example": "Wireless Headphones" },
+          "sku": { "type": "string", "example": "WH-100-PRO" },
+          "price": { "type": "number", "example": 99.99 },
+          "category": {
+            "type": "string",
+            "example": "65f1a2b3c4d5e6f7a8b9c0d1"
+          },
           "brand": { "type": "string", "example": "AudioMax" },
-          "condition": { "type": "string", "enum": ["new", "refurbished", "used"], "example": "new" },
-          "weight": { "type": "number", "example": 0.5 },
-          "isActive": { "type": "boolean", "default": true }
+          "condition": {
+            "type": "string",
+            "enum": ["new", "used", "refurbished"]
+          },
+          "weight": { "type": "number", "example": 0.5 }
         }
       },
-      "ErrorResponse": {
+      "Error": {
         "type": "object",
         "properties": {
           "success": { "type": "boolean", "example": false },
-          "message": { "type": "string", "example": "Detailed error message here" }
+          "message": {
+            "type": "string",
+            "example": "Detailed error message here"
+          }
         }
       }
     }
@@ -71,71 +80,99 @@
       "get": {
         "summary": "Login with Google",
         "tags": ["Auth"],
-        "responses": { "200": { "description": "Redirects to Google OAuth" } }
+        "responses": { "200": { "description": "Redirecting to Google..." } }
       }
     },
     "/auth/logout": {
       "get": {
         "summary": "Logout",
         "tags": ["Auth"],
-        "responses": { "200": { "description": "Session closed" } }
+        "responses": { "200": { "description": "Logged out successfully" } }
       }
     },
     "/products": {
       "get": {
         "summary": "Get all products",
         "tags": ["Products"],
-        "responses": { "200": { "description": "Returns array of products" } }
+        "responses": {
+          "200": { "description": "List of products retrieved" }
+        }
       },
       "post": {
-        "summary": "Create product (Auth Required)",
+        "summary": "Create product",
         "tags": ["Products"],
-        "security": [{ "cookieAuth": [] }],
         "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Product" }
+            }
+          }
         },
         "responses": {
           "201": { "description": "Created" },
-          "400": { "description": "Validation Error (Missing fields/Invalid data)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "400": {
+            "description": "Bad Request (Validation Error)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
           "401": { "description": "Unauthorized" },
           "409": { "description": "Conflict (Duplicate SKU)" }
         }
       }
     },
     "/products/{id}": {
-      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
       "get": {
         "summary": "Get product by ID",
         "tags": ["Products"],
         "responses": {
           "200": { "description": "Success" },
           "400": { "description": "Invalid ID format" },
-          "404": { "description": "Product not found" }
+          "404": {
+            "description": "Product Not Found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
         }
       },
       "put": {
-        "summary": "Update product (Auth Required)",
+        "summary": "Update product",
         "tags": ["Products"],
-        "security": [{ "cookieAuth": [] }],
         "requestBody": {
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Product" }
+            }
+          }
         },
         "responses": {
           "200": { "description": "Updated" },
-          "400": { "description": "Invalid ID or Validation Error" },
+          "400": { "description": "Bad Request (Validation Error)" },
           "401": { "description": "Unauthorized" },
-          "404": { "description": "Not Found" }
+          "404": { "description": "Product Not Found" }
         }
       },
       "delete": {
-        "summary": "Delete product (Auth Required)",
+        "summary": "Delete product",
         "tags": ["Products"],
-        "security": [{ "cookieAuth": [] }],
         "responses": {
           "200": { "description": "Deleted" },
+          "400": { "description": "Invalid ID" },
           "401": { "description": "Unauthorized" },
-          "404": { "description": "Not Found" }
+          "404": { "description": "Product Not Found" }
         }
       }
     },
@@ -146,54 +183,66 @@
         "responses": { "200": { "description": "Success" } }
       },
       "post": {
-        "summary": "Create category (Auth Required)",
+        "summary": "Create category",
         "tags": ["Categories"],
-        "security": [{ "cookieAuth": [] }],
         "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Category" }
+            }
+          }
         },
         "responses": {
           "201": { "description": "Created" },
-          "400": { "description": "Validation Error" },
+          "400": { "description": "Bad Request (Missing Fields)" },
           "401": { "description": "Unauthorized" },
-          "409": { "description": "Conflict (Name/Slug exists)" }
+          "409": { "description": "Conflict (Duplicate Name)" }
         }
       }
     },
     "/categories/{id}": {
-      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
       "get": {
         "summary": "Get category by ID",
         "tags": ["Categories"],
         "responses": {
           "200": { "description": "Success" },
-          "404": { "description": "Not Found" }
+          "400": { "description": "Invalid ID" },
+          "404": { "description": "Category Not Found" }
         }
       },
       "put": {
-        "summary": "Update category (Auth Required)",
+        "summary": "Update category",
         "tags": ["Categories"],
-        "security": [{ "cookieAuth": [] }],
         "requestBody": {
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Category" }
+            }
+          }
         },
         "responses": {
           "200": { "description": "Updated" },
-          "400": { "description": "Self-parenting error or Invalid ID" },
+          "400": { "description": "Bad Request" },
           "401": { "description": "Unauthorized" },
-          "404": { "description": "Not Found" }
+          "404": { "description": "Category Not Found" }
         }
       },
       "delete": {
-        "summary": "Delete category (Auth Required)",
+        "summary": "Delete category",
         "tags": ["Categories"],
-        "security": [{ "cookieAuth": [] }],
         "responses": {
           "200": { "description": "Deleted" },
-          "400": { "description": "Category in use by products" },
+          "400": { "description": "Bad Request (Category in use)" },
           "401": { "description": "Unauthorized" },
-          "404": { "description": "Not Found" }
+          "404": { "description": "Category Not Found" }
         }
       }
     }
