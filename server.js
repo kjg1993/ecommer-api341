@@ -10,7 +10,9 @@ const { connectDB } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 3001; 
+
+app.set("trust proxy", 1);
 
 app.use(cors({
     origin: true, 
@@ -30,7 +32,7 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'lax'
+        sameSite: 'none' 
     }
 }));
 
