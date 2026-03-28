@@ -57,10 +57,16 @@ app.use((req, res) => {
 });
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
-    console.log(`Auth url: http://localhost:3000/auth/google`);
+    
+    const displayUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://ecommer-api341.onrender.com' 
+      : `http://localhost:${PORT}`;
+      
+    console.log(`Swagger Docs: ${displayUrl}/api-docs`);
+    console.log(`Auth url: ${displayUrl}/auth/google`);
   });
 }).catch(err => {
   console.error('Failed to start server:', err);
