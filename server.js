@@ -3,8 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const passport = require('passport');
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json');
 
 dotenv.config();
 
@@ -14,13 +12,14 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 10000; 
 
-const swaggerOptions = {
-  swaggerOptions: {
-    withCredentials: true,
-  },
-};
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
+const swaggerOptions = {
+    swaggerOptions: {
+        withCredentials: true, 
+    },
+};
 
 app.set("trust proxy", 1);
 
@@ -51,9 +50,8 @@ app.use(passport.session());
 
 require('./config/passport');
 
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// SWAGGER ROUTE
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
 app.use('/', require('./routes'));
 
@@ -67,7 +65,6 @@ app.use((req, res) => {
 });
 
 connectDB().then(() => {
-
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 
